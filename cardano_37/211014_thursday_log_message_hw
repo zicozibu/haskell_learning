@@ -1,0 +1,92 @@
+--- LOG MESSAGING
+
+-- I -> Info
+-- W -> Warning
+-- E 2 -> Error with severity 2.  (Severity is from 1 to 100).
+-- Structure of the log:
+--    Type of log, time of the log, message of the log
+-- Examples
+-- I 42 Here is an info log
+-- W 89 Here is a warning
+-- E 15 98 Here is an error with severity 15
+-- here is a random log
+-- ...
+--
+data MessageType = Info
+                 | Warning
+                 | Error Int
+  deriving (Show, Eq)
+
+type Timestamp = Int
+
+-- Type for a single message in the log
+-- LogMessage Info 42 "Here is an info log"
+-- LogMessage Warning 89 "Here is a warning"
+-- LogMessage (Error 15) 98 "Here is an error with severity 15"
+-- Unknown "here is a random log"
+data LogMessage = LogMessage MessageType Timestamp String
+                | Unknown String
+  deriving (Show, Eq)
+
+-- Assignment:
+-- > parseLog "I 42 info\nW 89 warning\nE 100 12 error\nflasdjflkdsjfl"
+-- Output:
+-- [
+--    LogMessage Info 42 "info",
+--    LogMessage Warning 89 "warning",
+--    LogMessage (Error 100) 12 "error",
+--    Unknown "flasdjflkdsjfl"
+-- ] 
+parseLog :: String -> [LogMessage]
+parseLog rawContents = undefined
+
+----------------------
+-- Ordering logs
+-- MessageTree is just like any other binary tree, it is not ordered inherently.
+-- Assume all logs have different timestamp
+data MessageTree = Leaf
+                 | Node MessageTree LogMessage MessageTree
+
+-- inserts log into the tree
+-- assume that the tree is sorted
+-- ignore unknown logs
+-- (Node left log right)
+--    timestamps in left should be less than timestamp of log.
+--    timestamps in right should be more than timestamp of log.
+--        50
+--      /     \
+--     46     65
+--    /  \    /  \
+--  43    48  55  79
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) tree = tree
+insert (LogMessage _ _ _) tree = undefined
+
+-- convert list of logs to a ordered message tree
+build :: [LogMessage] -> MessageTree
+build [] = Leaf
+build (log:logs) = insert log (build logs)
+
+-- get sorted list of logs from a tree
+-- tree is already sorted
+inOrder :: MessageTree -> [LogMessage]
+inOrder tree = undefined
+
+-- After writing above functions,
+-- verify that this will remove all unknown logs
+sortedLogs :: [LogMessage] -> [LogMessage]
+sortedLogs logs = inOrder (build logs)
+
+---------------------------
+-- Log analysis
+-- Returns the string from all logs that had error severity > 50
+-- You should sort the logs first.
+-- whatWentWrong [LogMessage Info 98 "info", LogMessage (Error 51) 200 "error1", LogMessage (Error 99) 195 "error2"]
+-- ["error2", "error1"]
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong logs = whatWentWrongHelper (sortedLogs logs)
+
+-- assume that logs are sorted
+whatWentWrongHelper :: [LogMessage] -> [String]
+whatWentWrongHelper  [] = []
+whatWentWrongHelper (log:logs) = undefined
